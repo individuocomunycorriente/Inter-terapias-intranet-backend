@@ -1,28 +1,25 @@
-import express, { Request, Response } from 'express';
+// src/index.ts
+import express from 'express';
 import cors from 'cors';
+import publicRoutes from './routes/public.routes';
+import clinicalRoutes from './routes/clinical.routes';
 
 const app = express();
+const PORT = process.env.PORT || 4000;
 
-// Middlewares
+// Configuración de CORS y Parseadores de Body
 app.use(cors());
 app.use(express.json());
 
-// Ruta de prueba con Tipado Estricto de TS
-app.get('/', (req: Request, res: Response) => {
-    res.json({ 
-        mensaje: "¡Conexión exitosa!",
-        status: "ok"
-    });
+// Endpoints Públicos e Intranet
+app.use('/api', publicRoutes);
+app.use('/api', clinicalRoutes);
+
+// Endpoint de verificación del estado de salud del Backend
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', service: 'InterTerapia API' });
 });
 
-app.get('/wena', (req: Request, res: Response) => {
-    res.json({ 
-        mensaje: "kie exitosa!",
-        status: "ok"
-    });
-});
-
-const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor Express + TS corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor de InterTerapia corriendo en el puerto ${PORT}`);
 });

@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 
 // Instanciamos el cliente de Prisma
-const prisma = new PrismaClient();
 
-export default prisma;
+export const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });;

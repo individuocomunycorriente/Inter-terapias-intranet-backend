@@ -5,13 +5,21 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Administrator {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique // Ej: admin@interterapia.cl
+  password  String   // Contraseña encriptada (con bcrypt)
+  name      String   // Nombre del administrador
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // 1. Modelo para los Profesionales (Intranet y Sección de difusión)

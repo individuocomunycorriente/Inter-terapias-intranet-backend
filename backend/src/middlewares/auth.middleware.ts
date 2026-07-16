@@ -1,30 +1,42 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey_interterapia';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+export interface AuthenticatedRequest extends Request {
+  professional?: {
+    id: number;
+    email: string;
+    specialty: string;
+  };
+}
+
+export const requireAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Acceso no autorizado. Falta el token.' });
+    res.status(401).json({ message: 'No autorizado. Token inexistente o inválido.' });
+    return;
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: 'admin' | 'professional' };
-    req.user = decoded; // Guardamos el payload decodificado en la request
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: number;
+      email: string;
+      specialty: string;
+    };
+
+    // Validar el correo institucional requerido por requerimiento 
+    if (!decoded.email.endsWith('@interterapia.cl')) {
+      res.status(403).json({ message: 'Acceso denegado. Se requiere un correo institucional de InterTerapia.' });
+      return;
+    }
+
+    req.professional = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ message: 'Token inválido o expirado.' });
+    res.status(401).json({ message: 'Token inválido o expirado.' });
   }
-};
-
-// Middleware para restringir rutas solo a administradores
-export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Acceso denegado. Se requiere rol de Administrador.' });
-  }
-  next();
 };

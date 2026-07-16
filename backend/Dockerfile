@@ -22,6 +22,8 @@ ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; then npm install; else npm install --only=production; fi
 
 COPY prisma ./prisma/
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" npx prisma generate
+
 RUN npx prisma generate
 
 # Copiamos el código compilado
