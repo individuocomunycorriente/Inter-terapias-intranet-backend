@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../db';
 import { AppError } from '../utils/AppError';
 import { parseId } from '../utils/parseId';
+import { parsePagination, parseSearch } from '../utils/pagination';
 
 const PROFESSIONAL_PUBLIC_FIELDS = {
   id: true,
@@ -19,11 +20,25 @@ const PROFESSIONAL_PUBLIC_FIELDS = {
 // ----- Profesionales -----
 
 export const listProfessionals = async (req: Request, res: Response): Promise<void> => {
-  const professionals = await prisma.professional.findMany({
-    select: PROFESSIONAL_PUBLIC_FIELDS,
-    orderBy: { name: 'asc' },
-  });
-  res.json(professionals);
+  const { page, pageSize, skip, take } = parsePagination(req.query);
+  const search = parseSearch(req.query);
+
+  const where: Prisma.ProfessionalWhereInput = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { specialty: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+    : {};
+
+  const [items, total] = await Promise.all([
+    prisma.professional.findMany({ where, select: PROFESSIONAL_PUBLIC_FIELDS, orderBy: { name: 'asc' }, skip, take }),
+    prisma.professional.count({ where }),
+  ]);
+
+  res.json({ items, total, page, pageSize });
 };
 
 export const createProfessional = async (req: Request, res: Response): Promise<void> => {

@@ -1,5 +1,11 @@
 import apiClient from '../client';
-import type { Professional } from '../../types';
+import type { ListParams, Paginated, Professional, PublicProfessional } from '../../types';
+
+/** Listado público de difusión (sin autenticación), usado por el sitio informativo. */
+export const getPublicProfessionals = async (): Promise<PublicProfessional[]> => {
+  const { data } = await apiClient.get<PublicProfessional[]>('/professionals');
+  return data;
+};
 
 export interface ProfessionalInput {
   name: string;
@@ -9,8 +15,8 @@ export interface ProfessionalInput {
   imageUrl?: string;
 }
 
-export const listProfessionals = async (): Promise<Professional[]> => {
-  const { data } = await apiClient.get<Professional[]>('/admin/professionals');
+export const listProfessionals = async (params: ListParams = {}): Promise<Paginated<Professional>> => {
+  const { data } = await apiClient.get<Paginated<Professional>>('/admin/professionals', { params });
   return data;
 };
 

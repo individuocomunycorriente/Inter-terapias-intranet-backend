@@ -4,6 +4,7 @@ import type { PatientFile, ClinicalReport } from '../../types';
 import { getPatientFile } from '../../api/services/patients';
 import { createReport, updateReport } from '../../api/services/reports';
 import { getErrorMessage } from '../../utils/errors';
+import { formatRut } from '../../utils/rut';
 import ReportForm, { type ReportFormValues } from './ReportForm';
 
 interface PatientDetailProps {
@@ -58,10 +59,10 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patientId }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white border border-slate-200 rounded-xl p-5">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
         <h2 className="text-xl font-semibold text-slate-800">{file.fullName}</h2>
         <p className="text-sm text-slate-500">
-          RUT: {file.rut} · Edad: {file.age} {file.guardianName ? `· Apoderado/a: ${file.guardianName}` : ''}
+          RUT: {formatRut(file.rut)} · Edad: {file.age} {file.guardianName ? `· Apoderado/a: ${file.guardianName}` : ''}
         </p>
       </div>
 
@@ -70,7 +71,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patientId }) => {
         {!showNewForm && (
           <button
             onClick={() => setShowNewForm(true)}
-            className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            className="bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             + Nuevo informe
           </button>
@@ -102,7 +103,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patientId }) => {
           }
 
           return (
-            <div key={report.id} className="bg-white border border-slate-200 rounded-xl p-5">
+            <div key={report.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-semibold text-slate-700">
                   {report.professional?.name} · {report.professional?.specialty}
@@ -110,7 +111,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patientId }) => {
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-slate-400">{new Date(report.date).toLocaleDateString('es-CL')}</span>
                   {isOwner && (
-                    <button onClick={() => setEditingReport(report)} className="text-emerald-700 text-sm hover:underline">
+                    <button onClick={() => setEditingReport(report)} className="text-brand-green text-sm hover:underline font-medium">
                       Editar
                     </button>
                   )}

@@ -4,19 +4,34 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../db';
 import { AppError } from '../utils/AppError';
 import { parseId } from '../utils/parseId';
+import { parsePagination, parseSearch } from '../utils/pagination';
 
-// 1. Obtener listado de todos los pacientes para la selección
+// 1. Obtener listado paginado de pacientes para la selección
 export const getPatients = async (req: Request, res: Response): Promise<void> => {
-  const patients = await prisma.patient.findMany({
-    select: {
-      id: true,
-      fullName: true,
-      rut: true,
-      age: true,
-    },
-    orderBy: { fullName: 'asc' },
-  });
-  res.json(patients);
+  const { page, pageSize, skip, take } = parsePagination(req.query);
+  const search = parseSearch(req.query);
+
+  const where: Prisma.PatientWhereInput = search
+    ? {
+        OR: [
+          { fullName: { contains: search, mode: 'insensitive' } },
+          { rut: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+    : {};
+
+  const [items, total] = await Promise.all([
+    prisma.patient.findMany({
+      where,
+      select: { id: true, fullName: true, rut: true, age: true },
+      orderBy: { fullName: 'asc' },
+      skip,
+      take,
+    }),
+    prisma.patient.count({ where }),
+  ]);
+
+  res.json({ items, total, page, pageSize });
 };
 
 // 2. Obtener la ficha clínica prellenada y el historial clínico completo del paciente

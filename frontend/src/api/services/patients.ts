@@ -1,5 +1,5 @@
 import apiClient from '../client';
-import type { Patient, PatientFile } from '../../types';
+import type { ListParams, Paginated, Patient, PatientFile } from '../../types';
 
 export interface PatientInput {
   fullName: string;
@@ -9,8 +9,8 @@ export interface PatientInput {
   guardianName?: string;
 }
 
-export const listPatients = async (): Promise<Patient[]> => {
-  const { data } = await apiClient.get<Patient[]>('/patients');
+export const listPatients = async (params: ListParams = {}): Promise<Paginated<Patient>> => {
+  const { data } = await apiClient.get<Paginated<Patient>>('/patients', { params });
   return data;
 };
 

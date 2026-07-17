@@ -66,7 +66,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initial, onSubmit, onCancel, su
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
+    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 space-y-3">
       {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">{error}</div>}
       {FIELDS.map((field) => (
         <div key={field.key}>
@@ -76,7 +76,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initial, onSubmit, onCancel, su
             rows={2}
             value={values[field.key]}
             onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
           />
         </div>
       ))}
@@ -84,7 +84,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initial, onSubmit, onCancel, su
         <button
           type="submit"
           disabled={saving}
-          className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50"
+          className="bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50 transition-colors"
         >
           {saving ? 'Guardando...' : submitLabel}
         </button>
@@ -92,7 +92,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initial, onSubmit, onCancel, su
           <button
             type="button"
             onClick={onCancel}
-            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm transition-colors"
           >
             Cancelar
           </button>

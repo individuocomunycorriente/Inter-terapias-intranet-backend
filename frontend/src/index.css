@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+@theme {
+  --color-brand-lime: #a8c256;
+  --color-brand-lime-light: #eef3dd;
+  --color-brand-green: #4f7a3f;
+  --color-brand-green-dark: #375c2c;
+  --color-brand-petrol: #1f3d34;
+  --color-brand-petrol-dark: #14281f;
+  --color-brand-cream: #faf8f1;
+}

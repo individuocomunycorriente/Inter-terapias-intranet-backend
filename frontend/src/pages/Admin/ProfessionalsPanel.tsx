@@ -8,11 +8,19 @@ import {
   type ProfessionalInput,
 } from '../../api/services/professionals';
 import { getErrorMessage } from '../../utils/errors';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import SearchInput from '../../components/SearchInput';
+import Pagination from '../../components/Pagination';
 
 const EMPTY_FORM: ProfessionalInput = { name: '', email: '', password: '', specialty: '', imageUrl: '' };
+const PAGE_SIZE = 10;
 
 const ProfessionalsPanel: React.FC = () => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -24,7 +32,9 @@ const ProfessionalsPanel: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      setProfessionals(await listProfessionals());
+      const result = await listProfessionals({ search: debouncedSearch, page, pageSize: PAGE_SIZE });
+      setProfessionals(result.items);
+      setTotal(result.total);
     } catch (err) {
       setError(getErrorMessage(err, 'No se pudo cargar el listado de profesionales.'));
     } finally {
@@ -33,9 +43,15 @@ const ProfessionalsPanel: React.FC = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial del listado al montar
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga el listado al montar y cuando cambian búsqueda/página
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, page]);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const startCreate = () => {
     setEditingId(null);
@@ -91,14 +107,17 @@ const ProfessionalsPanel: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <h2 className="text-xl font-semibold text-slate-800">Profesionales</h2>
-        <button
-          onClick={startCreate}
-          className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          + Nuevo profesional
-        </button>
+        <div className="flex items-center gap-3">
+          <SearchInput value={search} onChange={handleSearchChange} placeholder="Buscar por nombre, correo o especialidad..." className="w-64" />
+          <button
+            onClick={startCreate}
+            className="bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors whitespace-nowrap"
+          >
+            + Nuevo profesional
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -106,7 +125,7 @@ const ProfessionalsPanel: React.FC = () => {
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-5 mb-6 space-y-3">
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 mb-6 space-y-3">
           <h3 className="font-semibold text-slate-700">{editingId ? 'Editar profesional' : 'Nuevo profesional'}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
@@ -114,7 +133,7 @@ const ProfessionalsPanel: React.FC = () => {
               placeholder="Nombre completo"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
             />
             <input
               required
@@ -122,14 +141,14 @@ const ProfessionalsPanel: React.FC = () => {
               placeholder="correo@interterapia.cl"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
             />
             <input
               required
               placeholder="Especialidad"
               value={form.specialty}
               onChange={(e) => setForm({ ...form, specialty: e.target.value })}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
             />
             <input
               type="password"
@@ -137,27 +156,27 @@ const ProfessionalsPanel: React.FC = () => {
               required={!editingId}
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
             />
             <input
               placeholder="URL de foto (opcional)"
               value={form.imageUrl}
               onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm sm:col-span-2"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm sm:col-span-2 focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
             />
           </div>
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={saving}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50"
+              className="bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50 transition-colors"
             >
               {saving ? 'Guardando...' : 'Guardar'}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm transition-colors"
             >
               Cancelar
             </button>
@@ -168,27 +187,27 @@ const ProfessionalsPanel: React.FC = () => {
       {loading ? (
         <p className="text-slate-500 text-sm">Cargando...</p>
       ) : (
-        <div className="overflow-x-auto bg-white border border-slate-200 rounded-xl">
+        <div className="overflow-x-auto bg-white border border-slate-200 rounded-xl shadow-sm">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-500 text-left">
               <tr>
-                <th className="px-4 py-2">Nombre</th>
-                <th className="px-4 py-2">Correo</th>
-                <th className="px-4 py-2">Especialidad</th>
-                <th className="px-4 py-2">Acciones</th>
+                <th className="px-4 py-2.5 font-medium">Nombre</th>
+                <th className="px-4 py-2.5 font-medium">Correo</th>
+                <th className="px-4 py-2.5 font-medium">Especialidad</th>
+                <th className="px-4 py-2.5 font-medium">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {professionals.map((professional) => (
-                <tr key={professional.id} className="border-t border-slate-100">
-                  <td className="px-4 py-2">{professional.name}</td>
-                  <td className="px-4 py-2">{professional.email}</td>
-                  <td className="px-4 py-2">{professional.specialty}</td>
-                  <td className="px-4 py-2 space-x-3">
-                    <button onClick={() => startEdit(professional)} className="text-emerald-700 hover:underline">
+                <tr key={professional.id} className="border-t border-slate-100 hover:bg-slate-50/60">
+                  <td className="px-4 py-2.5">{professional.name}</td>
+                  <td className="px-4 py-2.5">{professional.email}</td>
+                  <td className="px-4 py-2.5">{professional.specialty}</td>
+                  <td className="px-4 py-2.5 space-x-3">
+                    <button onClick={() => startEdit(professional)} className="text-brand-green hover:underline font-medium">
                       Editar
                     </button>
-                    <button onClick={() => handleDelete(professional)} className="text-red-600 hover:underline">
+                    <button onClick={() => handleDelete(professional)} className="text-red-600 hover:underline font-medium">
                       Eliminar
                     </button>
                   </td>
@@ -197,12 +216,13 @@ const ProfessionalsPanel: React.FC = () => {
               {professionals.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
-                    Aún no hay profesionales registrados.
+                    {search ? 'No se encontraron profesionales con ese criterio.' : 'Aún no hay profesionales registrados.'}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
         </div>
       )}
     </div>

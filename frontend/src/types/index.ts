@@ -1,5 +1,18 @@
 export type Role = 'admin' | 'professional';
 
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ListParams {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -17,6 +30,14 @@ export interface Professional {
   imageUrl?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Forma reducida que devuelve el endpoint público (sin correo ni fechas). */
+export interface PublicProfessional {
+  id: number;
+  name: string;
+  specialty: string;
+  imageUrl?: string | null;
 }
 
 export interface Patient {
