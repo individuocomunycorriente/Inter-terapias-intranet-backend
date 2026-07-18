@@ -3,7 +3,6 @@ import { Router } from 'express';
 import { requireAuth, requireRole } from '../middlewares/auth.middleware';
 import { validate } from '../middlewares/validate.middleware';
 import {
-  listProfessionals,
   createProfessional,
   updateProfessional,
   deleteProfessional,
@@ -21,7 +20,6 @@ const router = Router();
 router.use(requireAuth, requireRole('admin'));
 
 // Profesionales
-router.get('/admin/professionals', listProfessionals);
 router.post('/admin/professionals', validate(createProfessionalSchema), createProfessional);
 router.put('/admin/professionals/:id', validate(updateProfessionalSchema), updateProfessional);
 router.delete('/admin/professionals/:id', deleteProfessional);

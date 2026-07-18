@@ -1,24 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 
 interface SearchInputProps {
-  value: string;
-  onChange: (value: string) => void;
+  onSearch: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder, className }) => {
+const SearchInput: React.FC<SearchInputProps> = ({ onSearch, placeholder, className }) => {
+  const [draft, setDraft] = useState('');
+
+  const submit = () => onSearch(draft.trim());
+
   return (
-    <div className={`relative ${className ?? ''}`}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+    <div className={`flex ${className ?? ''}`}>
       <input
         type="search"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') submit();
+        }}
         placeholder={placeholder ?? 'Buscar...'}
-        className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-colors"
+        className="flex-1 min-w-0 px-3 py-2 bg-white border border-slate-200 rounded-l-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-colors"
       />
+      <button
+        type="button"
+        onClick={submit}
+        aria-label="Buscar"
+        className="px-3 bg-brand-green hover:bg-brand-green-dark text-white rounded-r-lg transition-colors shrink-0"
+      >
+        <Search size={16} />
+      </button>
     </div>
   );
 };

@@ -9,7 +9,7 @@ import { loginLimiter } from '../middlewares/rateLimit.middleware';
 const router = Router();
 
 // Rutas públicas de la Web de Difusión
-router.get('/professionals', getPublicProfessionals); // Sección pública "Profesionales"
+router.get('/public/professionals', getPublicProfessionals); // Sección pública "Profesionales"
 
 // Autenticación para la Intranet
 router.post('/auth/login', loginLimiter, validate(loginSchema), login);

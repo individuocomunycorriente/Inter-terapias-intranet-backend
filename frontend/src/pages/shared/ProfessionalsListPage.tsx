@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/useAuth';
 import type { Professional } from '../../types';
-import {
-  listProfessionals,
-  createProfessional,
-  updateProfessional,
-  deleteProfessional,
-  type ProfessionalInput,
-} from '../../api/services/professionals';
+import { listProfessionalsDirectory, createProfessional, type ProfessionalInput } from '../../api/services/professionals';
 import { getErrorMessage } from '../../utils/errors';
-import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import SearchInput from '../../components/SearchInput';
 import Pagination from '../../components/Pagination';
 
 const EMPTY_FORM: ProfessionalInput = { name: '', email: '', password: '', specialty: '', imageUrl: '' };
 const PAGE_SIZE = 10;
 
-const ProfessionalsPanel: React.FC = () => {
+const ProfessionalsListPage: React.FC = () => {
+  const { user } = useAuth();
+  const canManage = user?.role === 'admin';
+
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const debouncedSearch = useDebouncedValue(search);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<ProfessionalInput>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -32,7 +28,7 @@ const ProfessionalsPanel: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const result = await listProfessionals({ search: debouncedSearch, page, pageSize: PAGE_SIZE });
+      const result = await listProfessionalsDirectory({ search, page, pageSize: PAGE_SIZE });
       setProfessionals(result.items);
       setTotal(result.total);
     } catch (err) {
@@ -46,29 +42,11 @@ const ProfessionalsPanel: React.FC = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga el listado al montar y cuando cambian búsqueda/página
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, page]);
+  }, [search, page]);
 
-  const handleSearchChange = (value: string) => {
+  const handleSearch = (value: string) => {
     setSearch(value);
     setPage(1);
-  };
-
-  const startCreate = () => {
-    setEditingId(null);
-    setForm(EMPTY_FORM);
-    setShowForm(true);
-  };
-
-  const startEdit = (professional: Professional) => {
-    setEditingId(professional.id);
-    setForm({
-      name: professional.name,
-      email: professional.email,
-      password: '',
-      specialty: professional.specialty,
-      imageUrl: professional.imageUrl || '',
-    });
-    setShowForm(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,32 +54,14 @@ const ProfessionalsPanel: React.FC = () => {
     setSaving(true);
     setError('');
     try {
-      if (editingId) {
-        const payload: Partial<ProfessionalInput> = { ...form };
-        if (!payload.password) delete payload.password;
-        await updateProfessional(editingId, payload);
-      } else {
-        await createProfessional(form);
-      }
+      await createProfessional(form);
       setShowForm(false);
       setForm(EMPTY_FORM);
-      setEditingId(null);
       await load();
     } catch (err) {
-      setError(getErrorMessage(err, 'No se pudo guardar el profesional.'));
+      setError(getErrorMessage(err, 'No se pudo crear el profesional.'));
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleDelete = async (professional: Professional) => {
-    if (!window.confirm(`¿Eliminar a ${professional.name}? Esta acción no se puede deshacer.`)) return;
-    setError('');
-    try {
-      await deleteProfessional(professional.id);
-      await load();
-    } catch (err) {
-      setError(getErrorMessage(err, 'No se pudo eliminar el profesional.'));
     }
   };
 
@@ -110,13 +70,15 @@ const ProfessionalsPanel: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <h2 className="text-xl font-semibold text-slate-800">Profesionales</h2>
         <div className="flex items-center gap-3">
-          <SearchInput value={search} onChange={handleSearchChange} placeholder="Buscar por nombre, correo o especialidad..." className="w-64" />
-          <button
-            onClick={startCreate}
-            className="bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors whitespace-nowrap"
-          >
-            + Nuevo profesional
-          </button>
+          <SearchInput onSearch={handleSearch} placeholder="Buscar por nombre, correo o especialidad..." className="w-72" />
+          {canManage && (
+            <button
+              onClick={() => setShowForm((v) => !v)}
+              className="bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors whitespace-nowrap"
+            >
+              + Nuevo profesional
+            </button>
+          )}
         </div>
       </div>
 
@@ -124,9 +86,9 @@ const ProfessionalsPanel: React.FC = () => {
         <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm border border-red-100">{error}</div>
       )}
 
-      {showForm && (
+      {canManage && showForm && (
         <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 mb-6 space-y-3">
-          <h3 className="font-semibold text-slate-700">{editingId ? 'Editar profesional' : 'Nuevo profesional'}</h3>
+          <h3 className="font-semibold text-slate-700">Nuevo profesional</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               required
@@ -152,8 +114,8 @@ const ProfessionalsPanel: React.FC = () => {
             />
             <input
               type="password"
-              placeholder={editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}
-              required={!editingId}
+              placeholder="Contraseña"
+              required
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
@@ -194,28 +156,23 @@ const ProfessionalsPanel: React.FC = () => {
                 <th className="px-4 py-2.5 font-medium">Nombre</th>
                 <th className="px-4 py-2.5 font-medium">Correo</th>
                 <th className="px-4 py-2.5 font-medium">Especialidad</th>
-                <th className="px-4 py-2.5 font-medium">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {professionals.map((professional) => (
                 <tr key={professional.id} className="border-t border-slate-100 hover:bg-slate-50/60">
-                  <td className="px-4 py-2.5">{professional.name}</td>
+                  <td className="px-4 py-2.5">
+                    <Link to={String(professional.id)} className="text-brand-green-dark hover:underline font-medium">
+                      {professional.name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-2.5">{professional.email}</td>
                   <td className="px-4 py-2.5">{professional.specialty}</td>
-                  <td className="px-4 py-2.5 space-x-3">
-                    <button onClick={() => startEdit(professional)} className="text-brand-green hover:underline font-medium">
-                      Editar
-                    </button>
-                    <button onClick={() => handleDelete(professional)} className="text-red-600 hover:underline font-medium">
-                      Eliminar
-                    </button>
-                  </td>
                 </tr>
               ))}
               {professionals.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                  <td colSpan={3} className="px-4 py-6 text-center text-slate-400">
                     {search ? 'No se encontraron profesionales con ese criterio.' : 'Aún no hay profesionales registrados.'}
                   </td>
                 </tr>
@@ -229,4 +186,4 @@ const ProfessionalsPanel: React.FC = () => {
   );
 };
 
-export default ProfessionalsPanel;
+export default ProfessionalsListPage;

@@ -22,3 +22,11 @@ export const updateProfessionalSchema = z.object({
   specialty: z.string().min(1).optional(),
   imageUrl: z.string().url('URL de imagen inválida.').optional().or(z.literal('')),
 });
+
+// El profesional edita su propio perfil — sin email, es su identidad de login
+export const updateOwnProfileSchema = z.object({
+  name: z.string().min(1).optional(),
+  specialty: z.string().min(1).optional(),
+  imageUrl: z.string().url('URL de imagen inválida.').optional().or(z.literal('')),
+  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.').optional(),
+});

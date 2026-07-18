@@ -13,6 +13,10 @@ import Programs from './pages/Public/Programs';
 import Login from './pages/Login';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import TherapistDashboard from './pages/Therapist/TherapistDashboard';
+import PatientsListPage from './pages/shared/PatientsListPage';
+import PatientDetailPage from './pages/shared/PatientDetailPage';
+import ProfessionalsListPage from './pages/shared/ProfessionalsListPage';
+import ProfessionalDetailPage from './pages/shared/ProfessionalDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -33,12 +37,24 @@ const App: React.FC = () => {
 
           {/* Rutas Protegidas de Administración */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />}>
+              <Route index element={<Navigate to="profesionales" replace />} />
+              <Route path="profesionales" element={<ProfessionalsListPage />} />
+              <Route path="profesionales/:id" element={<ProfessionalDetailPage />} />
+              <Route path="pacientes" element={<PatientsListPage />} />
+              <Route path="pacientes/:id" element={<PatientDetailPage />} />
+            </Route>
           </Route>
 
           {/* Rutas Protegidas de Profesionales/Terapeutas */}
           <Route element={<ProtectedRoute allowedRoles={['professional']} />}>
-            <Route path="/dashboard" element={<TherapistDashboard />} />
+            <Route path="/dashboard" element={<TherapistDashboard />}>
+              <Route index element={<Navigate to="pacientes" replace />} />
+              <Route path="pacientes" element={<PatientsListPage />} />
+              <Route path="pacientes/:id" element={<PatientDetailPage />} />
+              <Route path="profesionales" element={<ProfessionalsListPage />} />
+              <Route path="profesionales/:id" element={<ProfessionalDetailPage />} />
+            </Route>
           </Route>
 
           {/* Redirección por defecto: a la portada pública */}

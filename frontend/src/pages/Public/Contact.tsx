@@ -1,5 +1,6 @@
 import React from 'react';
-import { Phone, Mail, Camera, Users, PlayCircle, MessageCircle } from 'lucide-react';
+import { Phone, Mail } from 'lucide-react';
+import { InstagramIcon, FacebookIcon, YoutubeIcon, WhatsAppIcon } from '../../components/icons/SocialIcons';
 import { SOCIAL_LINKS } from './navConfig';
 
 const Contact: React.FC = () => {
@@ -45,17 +46,17 @@ const Contact: React.FC = () => {
       <div className="bg-brand-cream rounded-xl p-6">
         <p className="text-xs text-slate-500 uppercase tracking-wide mb-4 text-center">Síguenos en redes sociales</p>
         <div className="flex items-center justify-center gap-4">
-          <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 text-brand-green-dark hover:shadow-md transition-shadow" aria-label="Instagram">
-            <Camera size={18} />
+          <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 hover:shadow-md transition-shadow" aria-label="Instagram">
+            <InstagramIcon size={20} />
           </a>
-          <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 text-brand-green-dark hover:shadow-md transition-shadow" aria-label="Facebook">
-            <Users size={18} />
+          <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 hover:shadow-md transition-shadow" aria-label="Facebook">
+            <FacebookIcon size={20} />
           </a>
-          <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 text-brand-green-dark hover:shadow-md transition-shadow" aria-label="YouTube">
-            <PlayCircle size={18} />
+          <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 hover:shadow-md transition-shadow" aria-label="YouTube">
+            <YoutubeIcon size={20} />
           </a>
-          <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 text-brand-green-dark hover:shadow-md transition-shadow" aria-label="WhatsApp">
-            <MessageCircle size={18} />
+          <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noreferrer" className="p-3 rounded-full bg-white border border-slate-200 hover:shadow-md transition-shadow" aria-label="WhatsApp">
+            <WhatsAppIcon size={20} />
           </a>
         </div>
       </div>

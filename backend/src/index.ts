@@ -7,6 +7,7 @@ import { env } from './config/env';
 import publicRoutes from './routes/public.routes';
 import authRoutes from './routes/auth.routes';
 import clinicalRoutes from './routes/clinical.routes';
+import professionalsRoutes from './routes/professionals.routes';
 import adminRoutes from './routes/admin.routes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
@@ -21,6 +22,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use('/api', publicRoutes);
 app.use('/api', authRoutes);
 app.use('/api', clinicalRoutes);
+app.use('/api', professionalsRoutes);
 app.use('/api', adminRoutes);
 
 // Endpoint de verificación del estado de salud del Backend

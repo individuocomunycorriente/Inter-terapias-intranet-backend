@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import apiClient from '../api/client';
 import { getErrorMessage } from '../utils/errors';
-import { TreePine, Lock, Mail, AlertCircle } from 'lucide-react';
+import Logo from '../components/Logo';
+import { Lock, Mail, AlertCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -38,8 +39,8 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="bg-white p-8 rounded-2xl shadow-xl w-full border border-slate-100">
           <div className="flex flex-col items-center mb-8">
-            <div className="p-3 bg-brand-lime-light rounded-full text-brand-green-dark mb-3">
-              <TreePine size={32} />
+            <div className="p-3 bg-brand-lime-light rounded-full mb-3">
+              <Logo size={40} />
             </div>
             <h1 className="text-2xl font-bold text-slate-800">InterTerapia</h1>
             <p className="text-slate-500 text-sm">Acceso profesional · Intranet de gestión clínica</p>

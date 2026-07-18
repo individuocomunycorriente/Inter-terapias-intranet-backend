@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { TreePine, Menu, X, Camera, Users, PlayCircle, MessageCircle } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import Logo from '../../components/Logo';
+import { InstagramIcon, FacebookIcon, YoutubeIcon, WhatsAppIcon } from '../../components/icons/SocialIcons';
 import { PUBLIC_NAV_ITEMS, SOCIAL_LINKS } from './navConfig';
 
 const PublicLayout: React.FC = () => {
@@ -11,7 +13,7 @@ const PublicLayout: React.FC = () => {
       <header className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <NavLink to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-            <TreePine className="text-brand-green-dark" size={26} />
+            <Logo size={36} />
             <div className="leading-tight">
               <p className="font-bold text-slate-800 tracking-tight">INTERTERAPIA</p>
               <p className="text-[10px] text-brand-green-dark font-medium tracking-wide">RE-HABILITACIÓN INTEGRAL</p>
@@ -87,21 +89,23 @@ const PublicLayout: React.FC = () => {
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col items-center gap-5">
           <p className="text-xs tracking-widest text-white/60 uppercase">Síguenos en redes sociales</p>
           <div className="flex items-center gap-4">
-            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors" aria-label="Instagram">
-              <Camera size={18} />
+            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white hover:scale-105 transition-transform" aria-label="Instagram">
+              <InstagramIcon size={18} />
             </a>
-            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors" aria-label="Facebook">
-              <Users size={18} />
+            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white hover:scale-105 transition-transform" aria-label="Facebook">
+              <FacebookIcon size={18} />
             </a>
-            <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors" aria-label="YouTube">
-              <PlayCircle size={18} />
+            <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white hover:scale-105 transition-transform" aria-label="YouTube">
+              <YoutubeIcon size={18} />
             </a>
-            <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors" aria-label="WhatsApp">
-              <MessageCircle size={18} />
+            <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noreferrer" className="p-2.5 rounded-full bg-white hover:scale-105 transition-transform" aria-label="WhatsApp">
+              <WhatsAppIcon size={18} />
             </a>
           </div>
           <div className="flex items-center gap-2 text-white/80">
-            <TreePine size={18} className="text-brand-lime" />
+            <span className="bg-white rounded-full p-1 flex items-center justify-center">
+              <Logo size={20} />
+            </span>
             <span className="font-semibold tracking-tight">InterTerapia · Re-Habilitación Integral</span>
           </div>
           <p className="text-xs text-white/40">© {new Date().getFullYear()} InterTerapia. Todos los derechos reservados.</p>
